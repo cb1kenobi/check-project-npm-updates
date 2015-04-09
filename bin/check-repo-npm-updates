@@ -1,0 +1,83 @@
+#!/usr/bin/env node
+
+var check = require('..'),
+    colors = require('colors'),
+    program = require('commander'),
+    ver = require('../package.json').version;
+
+program
+    .version(ver)
+    .usage('<github oauth token> [<repo>]')
+    .parse(process.argv);
+
+console.info('Check Repo NPM Updates, v%s\n', ver);
+
+if (program.args.length < 1) {
+    console.error('Error: Missing GitHub token');
+    program.help();
+}
+
+var util = require('util');
+global.dump = function dump() {
+	Array.prototype.slice.call(arguments).forEach(function (arg) {
+		console.log(util.inspect(arg, false, null, true));
+	});
+};
+
+function rpad(s, len) {
+    var ns = String(s).replace(/\u001b\[\d+m/g, ''),
+		i = ns.length;
+	while (i++ < len) {
+		ns += ' ';
+	}
+	return ns;
+}
+
+check(program.args[0], program.args[1], function (err, repos, packages) {
+    if (err) {
+        console.error(err);
+        console.info();
+        process.exit(1);
+    }
+
+    Object.keys(repos).sort().forEach(function (name) {
+        var repo = repos[name];
+        console.info(name.green.bold + (repo.private ? ' [private]'.yellow : '') + (repo.fork ? ' [fork]'.yellow : ''));
+        repo.description && console.info(repo.description.grey);
+        repo.url && console.info(repo.url);
+
+        Object.keys(repo.branches).sort(function (a, b) {
+            return a === repo.default_branch ? -1 : a < b ? -1 : a > b ? 1 : 0;
+        }).forEach(function (name) {
+            var branch = repo.branches[name];
+            console.info('  ' + name.cyan);
+
+            var longest = Math.max(
+                Object.keys(branch.dependencies).reduce(function (a, b) { return Math.max(a, b.length);}, 0),
+                Object.keys(branch.devDependencies).reduce(function (a, b) { return Math.max(a, b.length);}, 0)
+            ) + 8;
+
+            console.info('    Dependencies:');
+            if (Object.keys(branch.dependencies).length) {
+                Object.keys(branch.dependencies).forEach(function (pkg) {
+                    var dep = branch.dependencies[pkg];
+                    console.info(rpad('      ' + pkg + ':', longest) + ' '
+                        + (Array.isArray(dep) ? (rpad(dep[0], 10) + (' Latest Version: ' + dep[1]).magenta) : (dep || '*'.grey)));
+                });
+            } else {
+                console.info('      No dependencies'.grey);
+            }
+            console.info('    Dev Dependencies:');
+            if (Object.keys(branch.devDependencies).length) {
+                Object.keys(branch.devDependencies).forEach(function (pkg) {
+                    var dep = branch.devDependencies[pkg];
+                    console.info(rpad('      ' + pkg + ':', longest) + ' '
+                        + (Array.isArray(dep) ? (rpad(dep[0], 10) + (' Latest Version: ' + dep[1]).magenta) : (dep || '*'.grey)));
+                });
+            } else {
+                console.info('      No dev dependencies'.grey);
+            }
+            console.info();
+        });
+    });
+});

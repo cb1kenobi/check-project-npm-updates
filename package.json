@@ -1,0 +1,37 @@
+{
+  "name": "check-repo-npm-updates",
+  "version": "0.1.0",
+  "description": "Checks all of your GitHub repos for see if their dependencies are up-to-date.",
+  "main": "index.js",
+  "author": {
+    "name": "Chris Barber",
+    "email": "<chris@cb1inc.com>"
+  },
+  "license": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/cb1kenobi/check-repo-npm-updates/raw/master/LICENSE"
+    }
+  ],
+  "homepage": "https://github.com/cb1kenobi/check-repo-npm-updates",
+  "bugs": "https://github.com/cb1kenobi/check-repo-npm-updates/issues",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cb1kenobi/check-repo-npm-updates.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "check-repo-npm-updates": "./bin/check-repo-npm-updates"
+  },
+  "preferGlobal": true,
+  "dependencies": {
+    "async": "^0.9.0",
+    "colors": "^1.0.3",
+    "commander": "^2.7.1",
+    "github": "^0.2.3",
+    "npm": "^2.7.5",
+    "semver": "^4.3.3"
+  }
+}
