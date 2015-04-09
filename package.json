@@ -1,6 +1,6 @@
 {
   "name": "check-repo-npm-updates",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Checks all of your GitHub repos for see if their dependencies are up-to-date.",
   "main": "index.js",
   "author": {
